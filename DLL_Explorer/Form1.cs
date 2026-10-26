@@ -16,5 +16,18 @@ namespace DLL_Explorer
         {
             InitializeComponent();
         }
+
+        private void btOpen_Click(object sender, EventArgs e)
+        {
+            string filePath = string.Empty;
+            OpenFileDialog ofd = new OpenFileDialog();
+
+            ofd.Filter = "DLL Files (*.dll)|*.dll";
+            if (ofd.ShowDialog() == DialogResult.OK) { 
+                filePath = ofd.FileName;
+                MessageBox.Show(filePath);
+                
+            }
+        }
     }
 }
