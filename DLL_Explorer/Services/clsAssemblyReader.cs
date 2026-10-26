@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace DLL_Explorer.Services
@@ -41,6 +42,27 @@ namespace DLL_Explorer.Services
                 errorMessage = $"An unexpected error occurred: {ex.Message}";
                 return null;
             }
+        }
+
+        public Type[] GetAssemblyTypes(Assembly assembly)
+        {
+            Type[] types = null;
+            if (assembly == null)
+            {
+                return Array.Empty<Type>();
+            }
+            try
+            {
+                types = assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                types = ex.Types.Where(t => t != null).ToArray();
+            }
+            catch {
+                return Array.Empty<Type>();
+            }
+            return types;
         }
     }
 }

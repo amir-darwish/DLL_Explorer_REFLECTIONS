@@ -32,13 +32,25 @@ namespace DLL_Explorer
         {
             clsAssemblyReader reader = new clsAssemblyReader();
             Assembly assemblyDLL = reader.LoadFile(filePath, out string errorMessage);
+
             if (assemblyDLL == null)
             {
                 MessageBox.Show(errorMessage, "Assembly Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return;
             }
+            Type[] types = assemblyDLL.GetTypes();
 
             treeView1.Nodes.Clear();
-            treeView1.Nodes.Add(new TreeNode(assemblyDLL.GetName().Name));
+            TreeNode rootNode = new TreeNode(assemblyDLL.GetName().Name);
+
+            foreach (var type in types)
+            {
+                TreeNode typeNode = new TreeNode(type.Name);
+                rootNode.Nodes.Add(typeNode);
+            }
+            treeView1.Nodes.Add(rootNode);
+            rootNode.Expand();
+
+
 
 
         }
