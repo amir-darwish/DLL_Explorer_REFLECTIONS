@@ -64,5 +64,24 @@ namespace DLL_Explorer.Services
             }
             return types;
         }
+
+        public MethodInfo[] GetMethodByType(Type type)
+        {
+            if (type == null)
+            {
+                return Array.Empty<MethodInfo>();
+            }
+
+            try
+            {
+                return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic |
+                                       BindingFlags.Instance | BindingFlags.Static |
+                                       BindingFlags.DeclaredOnly);
+            }
+            catch
+            {
+                return Array.Empty<MethodInfo>();
+            }
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace DLL_Explorer
             {
                 MessageBox.Show(errorMessage, "Assembly Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return;
             }
-            Type[] types = assemblyDLL.GetTypes();
+            Type[] types = reader.GetAssemblyTypes(assemblyDLL);
 
             treeView1.Nodes.Clear();
             TreeNode rootNode = new TreeNode(assemblyDLL.GetName().Name);
@@ -45,16 +45,19 @@ namespace DLL_Explorer
             foreach (var type in types)
             {
                 TreeNode typeNode = new TreeNode(type.Name);
+                MethodInfo[] methods = reader.GetMethodByType(type);
+
+                foreach (var method in methods)
+                {
+                    TreeNode methodNode = new TreeNode(method.Name);
+                    typeNode.Nodes.Add(methodNode);
+                }
+
                 rootNode.Nodes.Add(typeNode);
             }
             treeView1.Nodes.Add(rootNode);
             rootNode.Expand();
 
-
-
-
         }
-
-
     }
 }
