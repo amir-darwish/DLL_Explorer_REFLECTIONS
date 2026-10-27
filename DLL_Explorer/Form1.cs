@@ -59,5 +59,15 @@ namespace DLL_Explorer
             rootNode.Expand();
 
         }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+
+        }
     }
 }
