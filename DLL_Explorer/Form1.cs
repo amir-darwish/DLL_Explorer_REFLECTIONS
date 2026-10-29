@@ -8,10 +8,32 @@ namespace DLL_Explorer
 {
     public partial class Form1 : Form
     {
+        enum enType { Class, Interface, Struct, Enum, Unknown };
         public Form1()
         {
             InitializeComponent();
         }
+
+        private enType GetReturnType(Type type)
+        {
+            if (type == null)
+                return enType.Unknown;
+
+            if (type.IsEnum)
+                return enType.Enum;
+
+            if (type.IsValueType)
+                return enType.Struct;
+
+            if (type.IsInterface)
+                return enType.Interface;
+
+            if (type.IsClass)
+                return enType.Class;
+
+            return enType.Unknown;
+        }
+
 
         private void btOpen_Click(object sender, EventArgs e)
         {
@@ -112,7 +134,7 @@ namespace DLL_Explorer
             if (e.Node.Tag is Type type)
             {
                 lblItemName.Text = type.Name;
-                lblItemType.Text = type.IsInterface ? "Interface" : "Class";
+                lblItemType.Text = this.GetReturnType(type).ToString();
 
                 txtSignature.Text = $"Full Name: {type.FullName}{Environment.NewLine}" +
                                     $"Namespace: {type.Namespace}{Environment.NewLine}" +
