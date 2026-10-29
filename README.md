@@ -5,6 +5,12 @@ It uses C# Reflection to show the types and members defined in an assembly.
 
 This is a learning project focused on Reflection and building a simple desktop interface.
 
+## Screenshot
+
+![DLL Explorer showing a sample library and method details](docs/images/dll-explorer.png)
+
+The screenshot uses a small sample .NET library.
+
 ## Features
 
 - Open a .NET DLL and display its file path.
