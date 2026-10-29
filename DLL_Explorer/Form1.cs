@@ -34,7 +34,6 @@ namespace DLL_Explorer
             return enType.Unknown;
         }
 
-
         private void btOpen_Click(object sender, EventArgs e)
         {
             string filePath = string.Empty;
@@ -44,77 +43,69 @@ namespace DLL_Explorer
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 filePath = ofd.FileName;
-                SendPathToAnlayseService(filePath);
-
-
-
+                LoadAssembly(filePath);
             }
         }
 
-        private void SendPathToAnlayseService(string filePath)
+        private void LoadAssembly(string filePath)
         {
             clsAssemblyReader reader = new clsAssemblyReader();
             Assembly assemblyDLL = reader.LoadFile(filePath, out string errorMessage);
 
             if (assemblyDLL == null)
             {
-                MessageBox.Show(errorMessage, "Assembly Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return;
+                MessageBox.Show(errorMessage, "Assembly Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
-            Type[] types = reader.GetAssemblyTypes(assemblyDLL);
+            DisplayAssembly(assemblyDLL, reader);
+        }
 
+        private void DisplayAssembly(Assembly assembly, clsAssemblyReader reader)
+        {
             treeView1.Nodes.Clear();
-            TreeNode rootNode = new TreeNode(assemblyDLL.GetName().Name);
+            TreeNode rootNode = new TreeNode(assembly.GetName().Name);
 
-            foreach (var type in types)
+            foreach (var type in reader.GetAssemblyTypes(assembly))
             {
-                TreeNode typeNode = new TreeNode(type.Name);
-                typeNode.Tag = type;
-
-                PropertyInfo[] properties = reader.GetPropertiesByType(type);
-                if (properties.Length > 0)
-                {
-                    TreeNode propsFolder = new TreeNode($"Properties ({properties.Length})");
-                    foreach (var prop in properties)
-                    {
-                        TreeNode propNode = new TreeNode(prop.Name);
-                        propNode.Tag = prop;
-                        propsFolder.Nodes.Add(propNode);
-                    }
-                    typeNode.Nodes.Add(propsFolder);
-                }
-
-                FieldInfo[] fields = reader.GetFieldsInfosByType(type);
-                if (fields.Length > 0)
-                {
-                    TreeNode fieldsFolder = new TreeNode($"Fields ({fields.Length})");
-                    foreach (var field in fields)
-                    {
-                        TreeNode fieldNode = new TreeNode(field.Name);
-                        fieldNode.Tag = field;
-                        fieldsFolder.Nodes.Add(fieldNode);
-                    }
-                    typeNode.Nodes.Add(fieldsFolder);
-                }
-
-
-                MethodInfo[] methods = reader.GetMethodByType(type);
-                if (methods.Length > 0)
-                {
-                    TreeNode methodsFolder = new TreeNode($"Methods ({methods.Length})");
-                    foreach (var method in methods)
-                    {
-                        TreeNode methodNode = new TreeNode(method.Name);
-                        methodNode.Tag = method;
-                        methodsFolder.Nodes.Add(methodNode);
-                    }
-                    typeNode.Nodes.Add(methodsFolder);
-                }
-                rootNode.Nodes.Add(typeNode);
+                rootNode.Nodes.Add(CreateTypeNode(type, reader));
             }
+
             treeView1.Nodes.Add(rootNode);
             rootNode.Expand();
-
         }
+
+        private TreeNode CreateTypeNode(Type type, clsAssemblyReader reader)
+        {
+            TreeNode typeNode = new TreeNode(type.Name);
+            typeNode.Tag = type;
+
+            AddMembersNodes(typeNode, "Properties", reader.GetPropertiesByType(type));
+
+            AddMembersNodes(typeNode, "Fields", reader.GetFieldsInfosByType(type));
+
+            AddMembersNodes(typeNode, "Methods", reader.GetMethodByType(type));
+
+            return typeNode;
+        }
+
+        private void AddMembersNodes(TreeNode parent, string categoryName, MemberInfo[] members)
+        {
+            if (members.Length == 0)
+                return;
+
+            TreeNode folder = new TreeNode(
+                $"{categoryName} ({members.Length})");
+
+            foreach (var member in members)
+            {
+                TreeNode memberNode = new TreeNode(member.Name);
+                memberNode.Tag = member;
+                folder.Nodes.Add(memberNode);
+            }
+
+            parent.Nodes.Add(folder);
+        }
+
 
         private void label2_Click(object sender, EventArgs e)
         {
@@ -125,57 +116,79 @@ namespace DLL_Explorer
         {
             if (e.Node?.Tag == null)
             {
-                lblItemName.Text = e.Node?.Text ?? "-";
-                lblItemType.Text = e.Node?.Parent == null ? "Assembly Root" : "Category Folder";
-                txtSignature.Clear();
+                SetDetails(e.Node?.Text ?? "-",
+                    e.Node?.Parent == null ? "Assembly Root" : "Category Folder",
+                    string.Empty);
                 return;
             }
 
             if (e.Node.Tag is Type type)
             {
-                lblItemName.Text = type.Name;
-                lblItemType.Text = this.GetReturnType(type).ToString();
-
-                txtSignature.Text = $"Full Name: {type.FullName}{Environment.NewLine}" +
-                                    $"Namespace: {type.Namespace}{Environment.NewLine}" +
-                                    $"Base Type: {type.BaseType?.Name ?? "None"}";
+                ShowTypeDetails(type);
             }
-
             else if (e.Node.Tag is MethodInfo method)
             {
-                lblItemName.Text = method.Name;
-                lblItemType.Text = method.ReturnType.Name;
-
-                var parameters = method.GetParameters()
-                                       .Select(p => $"{p.ParameterType.Name} {p.Name}");
-
-                string paramString = string.Join(", ", parameters);
-
-                string accessModifier = method.IsPublic ? "public" : "private/internal";
-                string staticModifier = method.IsStatic ? "static " : "";
-
-                txtSignature.Text = $"{accessModifier} {staticModifier}{method.ReturnType.Name} {method.Name}({paramString})";
+                ShowMethodDetails(method);
             }
             else if (e.Node.Tag is PropertyInfo prop)
             {
-                lblItemName.Text = prop.Name;
-                lblItemType.Text = prop.PropertyType.Name;
-
-                string getters = prop.CanRead ? "get; " : "";
-                string setters = prop.CanWrite ? "set; " : "";
-
-                txtSignature.Text = $"{prop.PropertyType.Name} {prop.Name} {{ {getters}{setters}}}";
+                ShowPropertyDetails(prop);
             }
             else if (e.Node.Tag is FieldInfo field)
             {
-                lblItemName.Text = field.Name;
-                lblItemType.Text = field.FieldType.Name;
-
-                string access = field.IsPublic ? "public" : "private/internal";
-                string isStatic = field.IsStatic ? "static " : "";
-
-                txtSignature.Text = $"{access} {isStatic}{field.FieldType.Name} {field.Name};";
+                ShowFieldDetails(field);
             }
+        }
+
+        private void SetDetails(string name, string type, string signature)
+        {
+            lblItemName.Text = name;
+            lblItemType.Text = type;
+            txtSignature.Text = signature;
+        }
+
+        private void ShowTypeDetails(Type type)
+        {
+            string signature = $"Full Name: {type.FullName}{Environment.NewLine}" +
+                               $"Namespace: {type.Namespace}{Environment.NewLine}" +
+                               $"Base Type: {type.BaseType?.Name ?? "None"}";
+
+            SetDetails(type.Name, this.GetReturnType(type).ToString(), signature);
+        }
+
+        private void ShowMethodDetails(MethodInfo method)
+        {
+            var parameters = method.GetParameters()
+                                   .Select(p => $"{p.ParameterType.Name} {p.Name}");
+
+            string paramString = string.Join(", ", parameters);
+
+            string accessModifier = method.IsPublic ? "public" : "private/internal";
+            string staticModifier = method.IsStatic ? "static " : "";
+
+            string signature = $"{accessModifier} {staticModifier}{method.ReturnType.Name} {method.Name}({paramString})";
+
+            SetDetails(method.Name, method.ReturnType.Name, signature);
+        }
+
+        private void ShowPropertyDetails(PropertyInfo prop)
+        {
+            string getters = prop.CanRead ? "get; " : "";
+            string setters = prop.CanWrite ? "set; " : "";
+
+            string signature = $"{prop.PropertyType.Name} {prop.Name} {{ {getters}{setters}}}";
+
+            SetDetails(prop.Name, prop.PropertyType.Name, signature);
+        }
+
+        private void ShowFieldDetails(FieldInfo field)
+        {
+            string access = field.IsPublic ? "public" : "private/internal";
+            string isStatic = field.IsStatic ? "static " : "";
+
+            string signature = $"{access} {isStatic}{field.FieldType.Name} {field.Name};";
+
+            SetDetails(field.Name, field.FieldType.Name, signature);
         }
     }
 }
