@@ -36,6 +36,7 @@
             this.lblItemName = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.tbLink = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -134,12 +135,23 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Name :";
             // 
+            // tbLink
+            // 
+            this.tbLink.Location = new System.Drawing.Point(208, 38);
+            this.tbLink.Name = "tbLink";
+            this.tbLink.ReadOnly = true;
+            this.tbLink.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.tbLink.Size = new System.Drawing.Size(536, 20);
+            this.tbLink.TabIndex = 3;
+            this.tbLink.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.tbLink);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.treeView1);
             this.Controls.Add(this.btOpen);
@@ -149,6 +161,7 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -162,6 +175,7 @@
         private System.Windows.Forms.Label lblItemName;
         private System.Windows.Forms.Label lblItemType;
         private System.Windows.Forms.TextBox txtSignature;
+        private System.Windows.Forms.TextBox tbLink;
     }
 }
 

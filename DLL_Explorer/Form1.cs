@@ -49,6 +49,7 @@ namespace DLL_Explorer
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 filePath = ofd.FileName;
+                tbLink.Text = filePath;
                 LoadAssembly(filePath);
             }
         }
@@ -198,6 +199,11 @@ namespace DLL_Explorer
         }
 
         private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
         {
 
         }
