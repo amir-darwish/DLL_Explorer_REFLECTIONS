@@ -1,9 +1,11 @@
 ﻿using DLL_Explorer.Services;
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+
 
 namespace DLL_Explorer
 {
@@ -40,6 +42,32 @@ namespace DLL_Explorer
             return enType.Unknown;
         }
 
+        private Color GetMemberColor(MemberInfo member)
+        {
+            if (member is MethodInfo method)
+            {
+                if (method.IsPublic) return Color.Teal;
+                if (method.IsPrivate) return Color.MediumPurple;
+            }
+            else if (member is FieldInfo field)
+            {
+                if (field.IsPublic) return Color.Teal;
+                if (field.IsPrivate) return Color.MediumPurple;
+            }
+            else if (member is PropertyInfo property)
+            {
+                MethodInfo[] accessors = property.GetAccessors(true);
+
+                if (accessors.Any(a => a.IsPublic))
+                    return Color.Teal;
+
+                if (accessors.Length > 0 && accessors.All(a => a.IsPrivate))
+                    return Color.MediumPurple;
+            }
+
+            return Color.DimGray;
+        }
+
         private void btOpen_Click(object sender, EventArgs e)
         {
             string filePath = string.Empty;
@@ -69,16 +97,24 @@ namespace DLL_Explorer
 
         private void DisplayAssembly(Assembly assembly, clsAssemblyReader reader)
         {
+            Type[] types = reader.GetAssemblyTypes(assembly);
             treeView1.Nodes.Clear();
             TreeNode rootNode = new TreeNode(assembly.GetName().Name);
 
-            foreach (var type in reader.GetAssemblyTypes(assembly))
+            foreach (var type in types)
             {
                 rootNode.Nodes.Add(CreateTypeNode(type, reader));
             }
 
             treeView1.Nodes.Add(rootNode);
             rootNode.Expand();
+
+            if (types.Length == 0)
+            {
+                MessageBox.Show(this,
+                    "No types were found or could be read in this assembly. It may be a type-forwarding assembly.",
+                    "No Types Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private TreeNode CreateTypeNode(Type type, clsAssemblyReader reader)
@@ -107,6 +143,7 @@ namespace DLL_Explorer
             {
                 TreeNode memberNode = new TreeNode(member.Name);
                 memberNode.Tag = member;
+                memberNode.ForeColor = GetMemberColor(member);
                 folder.Nodes.Add(memberNode);
             }
 
@@ -204,6 +241,11 @@ namespace DLL_Explorer
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
         {
 
         }

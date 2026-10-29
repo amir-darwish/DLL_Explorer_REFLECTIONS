@@ -37,6 +37,10 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.tbLink = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -44,7 +48,7 @@
             // 
             this.btOpen.BackColor = System.Drawing.Color.Teal;
             this.btOpen.ForeColor = System.Drawing.Color.White;
-            this.btOpen.Location = new System.Drawing.Point(44, 30);
+            this.btOpen.Location = new System.Drawing.Point(12, 29);
             this.btOpen.Name = "btOpen";
             this.btOpen.Size = new System.Drawing.Size(158, 37);
             this.btOpen.TabIndex = 0;
@@ -71,6 +75,10 @@
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.label5);
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.txtSignature);
             this.groupBox1.Controls.Add(this.lblItemType);
             this.groupBox1.Controls.Add(this.lblItemName);
@@ -137,13 +145,52 @@
             // 
             // tbLink
             // 
-            this.tbLink.Location = new System.Drawing.Point(208, 38);
+            this.tbLink.Location = new System.Drawing.Point(176, 38);
             this.tbLink.Name = "tbLink";
             this.tbLink.ReadOnly = true;
             this.tbLink.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.tbLink.Size = new System.Drawing.Size(536, 20);
             this.tbLink.TabIndex = 3;
             this.tbLink.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(15, 293);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(128, 18);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "Public Members:";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(15, 320);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(144, 18);
+            this.label4.TabIndex = 4;
+            this.label4.Text = "Private Members :";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.BackColor = System.Drawing.Color.Teal;
+            this.label5.Location = new System.Drawing.Point(165, 293);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(16, 18);
+            this.label5.TabIndex = 5;
+            this.label5.Text = " ";
+            this.label5.Click += new System.EventHandler(this.label5_Click);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.BackColor = System.Drawing.Color.MediumPurple;
+            this.label6.Location = new System.Drawing.Point(165, 320);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(16, 18);
+            this.label6.TabIndex = 6;
+            this.label6.Text = " ";
             // 
             // Form1
             // 
@@ -176,6 +223,10 @@
         private System.Windows.Forms.Label lblItemType;
         private System.Windows.Forms.TextBox txtSignature;
         private System.Windows.Forms.TextBox tbLink;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label6;
     }
 }
 
