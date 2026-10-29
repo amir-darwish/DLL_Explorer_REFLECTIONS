@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace DLL_Explorer
@@ -12,7 +13,12 @@ namespace DLL_Explorer
         public Form1()
         {
             InitializeComponent();
+            SetWindowTheme(treeView1.Handle, "Explorer", null);
+
         }
+
+        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        private static extern int SetWindowTheme(IntPtr handle, string theme, string subIdList);
 
         private enType GetReturnType(Type type)
         {
@@ -189,6 +195,11 @@ namespace DLL_Explorer
             string signature = $"{access} {isStatic}{field.FieldType.Name} {field.Name};";
 
             SetDetails(field.Name, field.FieldType.Name, signature);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
