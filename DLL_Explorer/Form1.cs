@@ -47,15 +47,46 @@ namespace DLL_Explorer
             {
                 TreeNode typeNode = new TreeNode(type.Name);
                 typeNode.Tag = type;
-                MethodInfo[] methods = reader.GetMethodByType(type);
 
-                foreach (var method in methods)
+                PropertyInfo[] properties = reader.GetPropertiesByType(type);
+                if (properties.Length > 0)
                 {
-                    TreeNode methodNode = new TreeNode(method.Name);
-                    methodNode.Tag = method;
-                    typeNode.Nodes.Add(methodNode);
+                    TreeNode propsFolder = new TreeNode($"Properties ({properties.Length})");
+                    foreach (var prop in properties)
+                    {
+                        TreeNode propNode = new TreeNode(prop.Name);
+                        propNode.Tag = prop;
+                        propsFolder.Nodes.Add(propNode);
+                    }
+                    typeNode.Nodes.Add(propsFolder);
                 }
 
+                FieldInfo[] fields = reader.GetFieldsInfosByType(type);
+                if (fields.Length > 0)
+                {
+                    TreeNode fieldsFolder = new TreeNode($"Fields ({fields.Length})");
+                    foreach (var field in fields)
+                    {
+                        TreeNode fieldNode = new TreeNode(field.Name);
+                        fieldNode.Tag = field;
+                        fieldsFolder.Nodes.Add(fieldNode);
+                    }
+                    typeNode.Nodes.Add(fieldsFolder);
+                }
+
+
+                MethodInfo[] methods = reader.GetMethodByType(type);
+                if (methods.Length > 0)
+                {
+                    TreeNode methodsFolder = new TreeNode($"Methods ({methods.Length})");
+                    foreach (var method in methods)
+                    {
+                        TreeNode methodNode = new TreeNode(method.Name);
+                        methodNode.Tag = method;
+                        methodsFolder.Nodes.Add(methodNode);
+                    }
+                    typeNode.Nodes.Add(methodsFolder);
+                }
                 rootNode.Nodes.Add(typeNode);
             }
             treeView1.Nodes.Add(rootNode);
@@ -73,7 +104,7 @@ namespace DLL_Explorer
             if (e.Node?.Tag == null)
             {
                 lblItemName.Text = e.Node?.Text ?? "-";
-                lblItemType.Text = "Assembly Root";
+                lblItemType.Text = e.Node?.Parent == null ? "Assembly Root" : "Category Folder";
                 txtSignature.Clear();
                 return;
             }
@@ -102,6 +133,26 @@ namespace DLL_Explorer
                 string staticModifier = method.IsStatic ? "static " : "";
 
                 txtSignature.Text = $"{accessModifier} {staticModifier}{method.ReturnType.Name} {method.Name}({paramString})";
+            }
+            else if (e.Node.Tag is PropertyInfo prop)
+            {
+                lblItemName.Text = prop.Name;
+                lblItemType.Text = prop.PropertyType.Name;
+
+                string getters = prop.CanRead ? "get; " : "";
+                string setters = prop.CanWrite ? "set; " : "";
+
+                txtSignature.Text = $"{prop.PropertyType.Name} {prop.Name} {{ {getters}{setters}}}";
+            }
+            else if (e.Node.Tag is FieldInfo field)
+            {
+                lblItemName.Text = field.Name;
+                lblItemType.Text = field.FieldType.Name;
+
+                string access = field.IsPublic ? "public" : "private/internal";
+                string isStatic = field.IsStatic ? "static " : "";
+
+                txtSignature.Text = $"{access} {isStatic}{field.FieldType.Name} {field.Name};";
             }
         }
     }

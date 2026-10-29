@@ -84,6 +84,39 @@ namespace DLL_Explorer.Services
             }
         }
 
-        
+        public PropertyInfo[] GetPropertiesByType(Type type)
+        {
+            if (type == null)
+            {
+                return Array.Empty<PropertyInfo>();
+            }
+
+            try
+            {
+                return type.GetProperties(DefaultFlags);
+            }
+            catch
+            {
+                return Array.Empty<PropertyInfo>();
+            }
+        }
+
+        public FieldInfo[] GetFieldsInfosByType(Type type)
+        {
+            if (type == null)
+            {
+                return Array.Empty<FieldInfo>();
+            }
+            try
+            {
+                return type.GetFields(DefaultFlags);
+            }
+            catch 
+            {
+                return Array.Empty<FieldInfo>();
+            }
+
+        }
+
     }
 }
