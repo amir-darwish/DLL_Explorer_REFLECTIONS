@@ -7,7 +7,9 @@ namespace DLL_Explorer.Services
 {
     internal class clsAssemblyReader
     {
-
+        private const BindingFlags DefaultFlags = BindingFlags.Public | BindingFlags.NonPublic |
+                                          BindingFlags.Instance | BindingFlags.Static |
+                                          BindingFlags.DeclaredOnly;
         public Assembly LoadFile(string path, out string errorMessage)
         {
             errorMessage = string.Empty;
@@ -74,14 +76,14 @@ namespace DLL_Explorer.Services
 
             try
             {
-                return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic |
-                                       BindingFlags.Instance | BindingFlags.Static |
-                                       BindingFlags.DeclaredOnly);
+                return type.GetMethods(DefaultFlags).Where(m => !m.IsSpecialName).ToArray(); // to hide _get and _set methods
             }
             catch
             {
                 return Array.Empty<MethodInfo>();
             }
         }
+
+        
     }
 }
